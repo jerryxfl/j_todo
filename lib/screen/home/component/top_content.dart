@@ -80,7 +80,7 @@ class UserInfoWidget extends StatelessWidget {
                                     fontSize: 18),
                               ),
                               Text(
-                                " 5 ",
+                                " ${todos.length} ",
                                 style: TextStyle(
                                   color: Constants.homeTopTextColor2,
                                   fontSize: 18,
@@ -247,6 +247,9 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15),
                           ),
+                          SizedBox(
+                            height: 10,
+                          ),
                           Text(
                             "${getTasksTodoSize(tasks[index])} todo",
                             style: TextStyle(
@@ -345,8 +348,12 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
                         ]),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal:20),
-                    child: LinearProgressIndicator(value: calculateTaskProgress(tasks[index]),backgroundColor: Color(0xffF1F1F2),minHeight: 10,),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: LinearProgressIndicator(
+                      value: calculateTaskProgress(tasks[index]),
+                      backgroundColor: Color(0xffF1F1F2),
+                      minHeight: 10,
+                    ),
                   )
                 ]),
                 flex: 2,
@@ -368,38 +375,37 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
     return count;
   }
 
-
   //计算task完成进度
-  double calculateTaskProgress(Task task){
+  double calculateTaskProgress(Task task) {
     //todo总数量
     int totalTodo = getTasksTodoSize(task);
 
     int completeSum = getTodoCompleteSum(task);
 
-    if(totalTodo == 0){
+    if (totalTodo == 0) {
       return 1;
-    }else{
-      return completeSum/totalTodo;
+    } else {
+      return completeSum / totalTodo;
     }
   }
 
-  String calculateTaskProgressStr(Task task){
+  String calculateTaskProgressStr(Task task) {
     double progress = calculateTaskProgress(task);
-    return NumUtil.getNumByValueDouble(progress*100, 0).toString();
+    return NumUtil.getNumByValueDouble(progress * 100, 0).toString();
   }
 
   //计算todo完成数量
-  int getTodoCompleteSum(Task task){
+  int getTodoCompleteSum(Task task) {
     List<Todo> completeTodo = [];
     todos.forEach((element) {
-      if(element.taskId == task.id){
+      if (element.taskId == task.id) {
         completeTodo.add(element);
       }
     });
 
     int completeSum = 0;
     completeTodo.forEach((element) {
-      if(element.isDone){
+      if (element.isDone) {
         completeSum++;
       }
     });

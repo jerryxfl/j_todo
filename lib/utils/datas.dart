@@ -7,7 +7,7 @@ import 'package:jerry_todo/bean/todo.dart';
 ///任务数据
 List<Task> tasks = [
   Task(id: 1, icon: "https://images.pexels.com/photos/3212378/pexels-photo-3212378.jpeg", title: "Learn UX Design", time: 1607783534000, isDone: false),
-  Task(id: 2, icon: "https://images.pexels.com/photos/3212378/pexels-photo-3212378.jpeg", title: "Learn UX Design2", time: 1607783534000, isDone: false),
+  Task(id: 2, icon: "https://images.pexels.com/photos/5849016/pexels-photo-5849016.jpeg", title: "Learn UX Design2", time: 1607783534000, isDone: false),
 ];
 
 

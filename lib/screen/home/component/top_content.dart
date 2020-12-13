@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jerry_todo/bean/task.dart';
 import 'package:jerry_todo/bean/todo.dart';
 import 'package:jerry_todo/provider/task_provider.dart';
+import 'package:jerry_todo/provider/todo_provider.dart';
 import 'package:jerry_todo/utils/constants.dart';
 import 'package:jerry_todo/utils/datas.dart';
 import 'package:jerry_todo/utils/date_utils.dart';
@@ -253,7 +254,7 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
                                 fontSize: 15),
                           ),
                           Text(
-                            "${getTasksTodoSize(task)} todo",
+                            "${Provider.of<TodoListProvider>(context).getTodoList(task).length} todo",
                             style: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.w400,
@@ -344,7 +345,7 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
                                     fontSize: 15,
                                     color: Colors.grey[400],
                                   )),
-                              Text("${calculateTaskProgressStr(task)}%",
+                              Text("${NumUtil.getNumByValueDouble(Provider.of<TodoListProvider>(context).calculateTaskProgress(task) * 100, 0).toString()}%",
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: Colors.black,
@@ -356,7 +357,7 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: LinearProgressIndicator(
-                            value: calculateTaskProgress(task),
+                            value: Provider.of<TodoListProvider>(context).calculateTaskProgress(task),
                             backgroundColor: Color(0xffF1F1F2),
                             minHeight: 10,
                           ),
@@ -373,50 +374,4 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
     );
   }
 
-  //获得每个任务有多少个todo
-  int getTasksTodoSize(Task task) {
-    int count = 0;
-    todos.forEach((element) {
-      if (element.taskId == task.id) count++;
-    });
-    return count;
-  }
-
-  //计算task完成进度
-  double calculateTaskProgress(Task task) {
-    //todo总数量
-    int totalTodo = getTasksTodoSize(task);
-
-    int completeSum = getTodoCompleteSum(task);
-
-    if (totalTodo == 0) {
-      return 1;
-    } else {
-      return completeSum / totalTodo;
-    }
-  }
-
-  String calculateTaskProgressStr(Task task) {
-    double progress = calculateTaskProgress(task);
-    return NumUtil.getNumByValueDouble(progress * 100, 0).toString();
-  }
-
-  //计算todo完成数量
-  int getTodoCompleteSum(Task task) {
-    List<Todo> completeTodo = [];
-    todos.forEach((element) {
-      if (element.taskId == task.id) {
-        completeTodo.add(element);
-      }
-    });
-
-    int completeSum = 0;
-    completeTodo.forEach((element) {
-      if (element.isDone) {
-        completeSum++;
-      }
-    });
-
-    return completeSum;
-  }
 }

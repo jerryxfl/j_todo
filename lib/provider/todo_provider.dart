@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jerry_todo/bean/task.dart';
 import 'package:jerry_todo/bean/todo.dart';
-import 'package:jerry_todo/utils/datas.dart';
 
 class TodoListProvider extends ChangeNotifier{
   List<Todo> todoList;
@@ -46,4 +45,22 @@ class TodoListProvider extends ChangeNotifier{
     return resultTodoList;
   }
 
+
+  double calculateTaskProgress(Task task) {
+    //todo总数量
+    List<Todo> totalTodoList = getTodoList(task);
+
+    int completeSum = 0;
+
+    totalTodoList.forEach((element) {
+      if(element.isDone)completeSum ++;
+    });
+
+
+    if (totalTodoList.length == 0) {
+      return 1;
+    } else {
+      return completeSum / totalTodoList.length;
+    }
+  }
 }

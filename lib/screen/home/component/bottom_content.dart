@@ -5,6 +5,8 @@ import 'package:jerry_todo/bean/task.dart';
 import 'package:jerry_todo/bean/todo.dart';
 import 'package:jerry_todo/provider/task_provider.dart';
 import 'package:jerry_todo/provider/todo_provider.dart';
+import 'package:jerry_todo/route/Routes.dart';
+import 'package:jerry_todo/screen/task/task_page.dart';
 import 'package:jerry_todo/utils/constants.dart';
 import 'package:jerry_todo/utils/datas.dart';
 import 'package:jerry_todo/utils/date_utils.dart';
@@ -67,12 +69,23 @@ class AddNewTaskWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         //添加新的task
-        Provider.of<TaskListProvider>(context, listen: false).addTask(Task(
-            id: tasks.length + 1,
-            icon: tasks[0].icon,
-            title: tasks[0].title,
-            time: tasks[0].time,
-            isDone: false));
+        Navigator.of(context).push(PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 200),
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return TaskPage();
+            },
+            transitionsBuilder:  (BuildContext context, Animation<double> animation1, Animation<double> animation2, Widget child){
+              return ScaleTransition(
+                alignment: Alignment.bottomRight,
+                scale: Tween(
+                    begin: 0.0,
+                    end:1.0).animate(
+                    CurvedAnimation(
+                        curve: Curves.ease,
+                        parent: animation1)),
+                child: child,);
+            }
+        ));
       },
       child: Container(
         height: 60,
@@ -101,18 +114,17 @@ class _TaskListWidgetState extends State<TaskListWidget> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemBuilder: (context,index) => _taskItemBuilder(context,Provider.of<TaskListProvider>(context).taskList[index],index),
+      itemBuilder: (context, index) => _taskItemBuilder(context,
+          Provider.of<TaskListProvider>(context).taskList[index], index),
       itemCount: Provider.of<TaskListProvider>(context).taskList.length,
       physics: BouncingScrollPhysics(),
     );
   }
 
-  Widget _taskItemBuilder(BuildContext context, Task task,int index) {
+  Widget _taskItemBuilder(BuildContext context, Task task, int index) {
     return Container(
-      height: 200.0 +
-          Provider.of<TodoListProvider>(context)
-                  .getTodoList(task)
-                  .length *
+      height: 130.0 +
+          Provider.of<TodoListProvider>(context).getTodoList(task).length *
               60.0,
       margin: EdgeInsets.only(
           left: 20, right: 20, top: index == 0 ? 0 : 10, bottom: 10),
@@ -172,8 +184,10 @@ class _TaskListWidgetState extends State<TaskListWidget> {
                       child: ListView.builder(
                         itemBuilder: (context, index) => _todoItemBuild(
                             context,
-                            Provider.of<TodoListProvider>(context).getTodoList(task)[index]),
-                        itemCount:Provider.of<TodoListProvider>(context).getTodoList(task)
+                            Provider.of<TodoListProvider>(context)
+                                .getTodoList(task)[index]),
+                        itemCount: Provider.of<TodoListProvider>(context)
+                            .getTodoList(task)
                             .length,
                         physics: NeverScrollableScrollPhysics(),
                       ),
@@ -182,16 +196,14 @@ class _TaskListWidgetState extends State<TaskListWidget> {
                   //addTodos
                   GestureDetector(
                     onTap: () {
+                      //添加新的todo
                       Provider.of<TodoListProvider>(context, listen: false)
                           .addTodo(Todo(
-                              id: todos.length + 1,
-                              taskId: Provider.of<TaskListProvider>(context,
-                                      listen: false)
-                                  .taskList[index]
-                                  .id,
-                              content: "New Todo1",
+                              id: todos.length,
+                              taskId: task.id,
+                              content: "New Todo",
                               isDone: false,
-                              startTime: DateTime.now().microsecond));
+                              startTime: DateTime.now().millisecondsSinceEpoch));
                     },
                     child: Container(
                       height: 50,
@@ -270,9 +282,9 @@ class _TaskListWidgetState extends State<TaskListWidget> {
         Expanded(
           child: IconButton(
             onPressed: () {
-              setState(() {
-                todo.isDone = !todo.isDone;
-              });
+              todo.isDone = !todo.isDone;
+              Provider.of<TodoListProvider>(context, listen: false)
+                  .updateTodo(todo);
             },
             icon: Icon(
               todo.isDone

@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jerry_todo/bean/task.dart';
 import 'package:jerry_todo/bean/todo.dart';
+import 'package:jerry_todo/provider/task_provider.dart';
 import 'package:jerry_todo/utils/constants.dart';
 import 'package:jerry_todo/utils/datas.dart';
 import 'package:jerry_todo/utils/date_utils.dart';
+import 'package:provider/provider.dart';
 
 class TopContentWidget extends StatelessWidget {
   @override
@@ -80,7 +82,7 @@ class UserInfoWidget extends StatelessWidget {
                                     fontSize: 18),
                               ),
                               Text(
-                                " ${todos.length} ",
+                                " ${Provider.of<TaskListProvider>(context).taskList.length} ",
                                 style: TextStyle(
                                   color: Constants.homeTopTextColor2,
                                   fontSize: 18,
@@ -180,6 +182,7 @@ class UserTasksListWidget extends StatefulWidget {
 class _UserTasksListWidgetState extends State<UserTasksListWidget> {
   @override
   Widget build(BuildContext context) {
+
     return Container(
       child: Stack(
         children: [
@@ -201,8 +204,9 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
           ),
           Container(
             child: ListView.builder(
-              itemBuilder: _itemBuilder,
-              itemCount: tasks.length,
+              itemBuilder: (context, index) =>
+                  _itemBuilder(context, Provider.of<TaskListProvider>(context).taskList[index]),
+              itemCount: Provider.of<TaskListProvider>(context).taskList.length,
               scrollDirection: Axis.horizontal,
               physics: BouncingScrollPhysics(),
             ),
@@ -212,7 +216,7 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
     );
   }
 
-  Widget _itemBuilder(BuildContext context, int index) {
+  Widget _itemBuilder(BuildContext context, Task task) {
     var size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.only(left: 20),
@@ -231,27 +235,25 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
                 children: [
                   Row(children: [
                     CircleAvatar(
-                      backgroundImage: NetworkImage(tasks[index].icon),
+                      backgroundImage: NetworkImage(task.icon),
                       backgroundColor: Colors.white,
                     ),
                     SizedBox(
                       width: 15,
                     ),
                     Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            tasks[index].title,
+                            task.title,
                             style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15),
                           ),
-                          SizedBox(
-                            height: 10,
-                          ),
                           Text(
-                            "${getTasksTodoSize(tasks[index])} todo",
+                            "${getTasksTodoSize(task)} todo",
                             style: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.w400,
@@ -302,7 +304,7 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
                               width: 10,
                             ),
                             Text(
-                              DateUtils.stampToDate(tasks[index].time),
+                              DateUtils.stampToDate(task.time),
                               style: TextStyle(
                                 color: Colors.grey[400],
                                 fontSize: 15,
@@ -329,33 +331,38 @@ class _UserTasksListWidgetState extends State<UserTasksListWidget> {
                 flex: 1,
               ),
               Expanded(
-                child: Column(children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Progress",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.grey[400],
-                              )),
-                          Text("${calculateTaskProgressStr(tasks[index])}%",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.black,
-                              )),
-                        ]),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: LinearProgressIndicator(
-                      value: calculateTaskProgress(tasks[index]),
-                      backgroundColor: Color(0xffF1F1F2),
-                      minHeight: 10,
-                    ),
-                  )
-                ]),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Progress",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.grey[400],
+                                  )),
+                              Text("${calculateTaskProgressStr(task)}%",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  )),
+                            ]),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: LinearProgressIndicator(
+                            value: calculateTaskProgress(task),
+                            backgroundColor: Color(0xffF1F1F2),
+                            minHeight: 10,
+                          ),
+                        ),
+                      )
+                    ]),
                 flex: 2,
               ),
             ]),

@@ -49,4 +49,9 @@ class DateUtils{
     return "${date.day} $month ${date.year}";
   }
 
+
+  static stampToDay(int stamp){
+    var date = DateTime.fromMicrosecondsSinceEpoch(stamp);
+    return "${date.year}-${date.month}-${date.day}";
+  }
 }

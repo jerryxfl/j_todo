@@ -152,7 +152,9 @@ class _TaskListWidgetState extends State<TaskListWidget> {
                       SizedBox(
                         width: 10,
                       ),
-                      Text(tasks[index].title,
+                      Text(tasks[index].title.length>15?"${tasks[index].title.substring(0,15)}...":tasks[index].title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 15,
@@ -203,7 +205,8 @@ class _TaskListWidgetState extends State<TaskListWidget> {
                               taskId: task.id,
                               content: "New Todo",
                               isDone: false,
-                              startTime: DateTime.now().millisecondsSinceEpoch));
+                              startTime: DateTime.now().millisecondsSinceEpoch
+                      ));
                     },
                     child: Container(
                       height: 50,

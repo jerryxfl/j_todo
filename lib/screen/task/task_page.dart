@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jerry_todo/bean/task.dart';
 import 'package:jerry_todo/provider/task_provider.dart';
+import 'package:jerry_todo/utils/SqliteHelper.dart';
 import 'package:jerry_todo/utils/constants.dart';
 import 'package:jerry_todo/utils/datas.dart';
 import 'package:provider/provider.dart';
@@ -18,12 +19,6 @@ class _TaskPageState extends State<TaskPage> {
   @override
   void initState() {
     super.initState();
-    newTask = Task(
-        id: tasks.length,
-        icon: Constants.taskDefaultIcon,
-        title: "New Task",
-        time: DateTime.now().microsecondsSinceEpoch,
-        isDone: false);
   }
 
   @override
@@ -31,8 +26,10 @@ class _TaskPageState extends State<TaskPage> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       body: WillPopScope(
-        onWillPop: () async{
-          Provider.of<TaskListProvider>(context,listen: false).addTask(newTask);
+        onWillPop: () async {
+          if (newTask != null)
+            Provider.of<TaskListProvider>(context, listen: false)
+                .addTask(newTask);
           return true;
         },
         child: Container(
@@ -43,13 +40,16 @@ class _TaskPageState extends State<TaskPage> {
                   color: Constants.homeTopBackgroundColor,
                   child: SafeArea(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             GestureDetector(
                                 onTap: () {
-                                  Provider.of<TaskListProvider>(context,listen: false).addTask(newTask);
+                                  Provider.of<TaskListProvider>(context,
+                                          listen: false)
+                                      .addTask(newTask);
                                   Navigator.pop(context);
                                 },
                                 child: Icon(FontAwesomeIcons.chevronLeft)),
@@ -64,8 +64,21 @@ class _TaskPageState extends State<TaskPage> {
                                 border: InputBorder.none,
                               ),
                               onChanged: (value) {
+                                if (newTask == null) {
+                                  newTask = Task(
+                                      id: tasks.length,
+                                      icon: Constants.taskDefaultIcon,
+                                      title: value,
+                                      time:
+                                          DateTime.now().microsecondsSinceEpoch,
+                                      isDone: false);
+                                }
                                 newTask.title = value;
                               },
+                                  onSubmitted: (value){
+                                    SqliteHelper sqliteHelper = SqliteHelper();
+                                    sqliteHelper.addTask(newTask);
+                                  },
                             ))
                           ]),
                     ),

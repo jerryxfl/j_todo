@@ -20,7 +20,7 @@ class RootApp extends StatelessWidget {
     sqliteHelper.initDB();
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_)=>TaskListProvider(taskList: tasks),),
+        ChangeNotifierProvider(create: (_)=>TaskListProvider(),),
         ChangeNotifierProvider(create: (_)=>TodoListProvider(todoList: todos),),
       ],
       child: MaterialApp(
